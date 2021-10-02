@@ -3,6 +3,8 @@
     require_once($_SERVER['DOCUMENT_ROOT']."/api/REST.api.php");
     require_once ($_SERVER['DOCUMENT_ROOT']."/api/lib/Database.class.php");
     require_once($_SERVER['DOCUMENT_ROOT']."/api/lib/Signup.class.php");
+    require_once($_SERVER['DOCUMENT_ROOT']."/api/lib/Auth.class.php");
+    require_once($_SERVER['DOCUMENT_ROOT']."/api/lib/User.class.php");
 
     class API extends REST {
 
@@ -107,7 +109,8 @@
             }else{
                 $data = [
                     "error" => "Bad request",
-                    "method" => $this->get_request_method(),
+                    // "method" => $this->get_request_method(),
+                    
                     
                 ];
                 $data = $this->json($data);

@@ -22,9 +22,6 @@ ${basename(__FILE__,'.php')} = function(){
     }else{
         $data = [
             "error" => "Bad request",
-            "method" => $this->get_request_method(),
-            "Query" => $this->query,
-            
         ];
         $data = $this->json($data);
         $this->response($data, 400);
