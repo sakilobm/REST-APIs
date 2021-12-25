@@ -1,0 +1,1 @@
+env.js this file goes to out of htdocs folder
