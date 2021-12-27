@@ -66,6 +66,21 @@ class API extends REST
             $this->auth = new Auth($token[1]);
         }
     }
+    public function isAuthenticated(){
+        if($this->auth == null){
+            return false;
+        }
+        if($this->auth->getOAuth()->authenticate() and isset($_SESSION['username'])){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //Todo : Last Changes Not Checked
+    public function getUsername()
+    {
+        return $_SESSION['username'];
+    }
 
     public function die($e){
         $data = [

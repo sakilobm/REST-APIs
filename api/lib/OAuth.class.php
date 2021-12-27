@@ -44,7 +44,11 @@ class OAuth{
             $data = mysqli_fetch_assoc($result);
             $created_at = strtotime($data['created_at']);
             $expires_at = $created_at + $data['valid_for'];
+
             if(time() <= $expires_at ){
+                if(session_status() == PHP_SESSION_NONE){
+                    session_start();
+                }
                 $this->username = $_SESSION['username'] = $data['username'];
                 $_SESSION['token'] = $this->access_token;
                 return true;
