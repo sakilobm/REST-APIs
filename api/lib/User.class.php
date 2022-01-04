@@ -8,9 +8,10 @@ require $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
         private $user;
 
         public function __construct($username){
+            $this->token;
             $this->username = $username;
             $this->db = Database::getConnection();
-            $query = "SELECT * FROM tables WHERE username='$this->username' OR email='$this->username';";
+            $query = "SELECT * FROM tables WHERE username='$this->username' OR email='$this->username' OR token= '$this->token';";
             // echo $query;
             $result = mysqli_query($this->db,$query);
             if(mysqli_num_rows($result)==1){
@@ -19,8 +20,11 @@ require $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
                 throw new Exception("User not found");
             }
         }
+        public function getId(){
+            return $this->user['id'];
+        }
         public function getUsername(){
-            return $this->user['username']; //i'm puted name wrongly changed to username
+            return $this->user['username'];
         }
         public function getPasswordHash(){
             return $this->user['password'];

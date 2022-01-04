@@ -48,7 +48,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/api/auth/login.php');
                 return 'a';
             }
         }
-
         public function getOAuth(){
             return $this->oauth;
         }

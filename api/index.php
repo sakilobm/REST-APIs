@@ -34,23 +34,30 @@ class API extends REST
         } else {
             if (isset($_GET['namespace'])) {
                 $dir = $_SERVER['DOCUMENT_ROOT'].'/api/'.$_GET['namespace'];
-                $methods = scandir($dir);
-                 /** 
+                $file = $dir.'/'.$func.'.php';
+                if(file_exists($file)){
+                    include $file;
+                    $this->current_call = Closure::bind(${$func}, $this, get_class());
+                    $this->$func();
+                }
+
+                /** 
                  * Use the following snippet if you want to include multiple files
                  */
                 // var_dump($methods);
-                foreach($methods as $m) {
-                    if($m == "." or $m == "..") {
-                        continue;
-                    }
-                    $basem = basename($m, '.php');
-                    // echo "Trying to call $basem() for $func()\n"
-                    if ($basem == $func) {
-                        include $dir . "/" . $m;
-                        $this->current_call = Closure::bind(${$basem}, $this, get_class());
-                        $this->$basem();
-                    }
-                }
+                // $methods = scandir($dir);
+                // foreach($methods as $m) {
+                //     if($m == "." or $m == "..") {
+                //         continue;
+                //     }
+                //     $basem = basename($m, '.php');
+                //     // echo "Trying to call $basem() for $func()\n"
+                //     if ($basem == $func) {
+                //         include $dir . "/" . $m;
+                //         $this->current_call = Closure::bind(${$basem}, $this, get_class());
+                //         $this->$basem();
+                //     }
+                // }
             } else {
                 //we can even process fuctions without namespace here
                 $this->response($this->json(['error'=>'method_not_found']),404);
