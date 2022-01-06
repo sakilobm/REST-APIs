@@ -8,10 +8,9 @@ require_once($_SERVER['DOCUMENT_ROOT'] . "/api/lib/User.class.php");
 
 class API extends REST
 {
-
     public $data = "";
 
-    private $db = NULL;
+    private $db = null;
     private $current_call;
     private $auth;
 
@@ -27,7 +26,6 @@ class API extends REST
          */
     public function processApi()
     {
-        
         $func = strtolower(trim(str_replace("/", "", $_REQUEST['rquest'])));
         if ((int)method_exists($this, $func) > 0) {
             $this->$func();
@@ -35,13 +33,15 @@ class API extends REST
             if (isset($_GET['namespace'])) {
                 $dir = $_SERVER['DOCUMENT_ROOT'].'/api/'.$_GET['namespace'];
                 $file = $dir.'/'.$func.'.php';
-                if(file_exists($file)){
+                if (file_exists($file)) {
                     include $file;
                     $this->current_call = Closure::bind(${$func}, $this, get_class());
                     $this->$func();
+                } else {
+                    $this->response($this->json(['error'=>'method_not_found']), 404);
                 }
 
-                /** 
+                /**
                  * Use the following snippet if you want to include multiple files
                  */
                 // var_dump($methods);
@@ -60,26 +60,28 @@ class API extends REST
                 // }
             } else {
                 //we can even process fuctions without namespace here
-                $this->response($this->json(['error'=>'method_not_found']),404);
+                $this->response($this->json(['error'=>'method_not_found']), 404);
             }
         }
         // If the method not exist with in this class, response would be "Page not found".
     }
 
-    public function auth(){
+    public function auth()
+    {
         $headers = getallheaders();
-        if(isset($headers['Authorization'])){
-            $token = explode(' ',$headers['Authorization']);
+        if (isset($headers['Authorization'])) {
+            $token = explode(' ', $headers['Authorization']);
             $this->auth = new Auth($token[1]);
         }
     }
-    public function isAuthenticated(){
-        if($this->auth == null){
+    public function isAuthenticated()
+    {
+        if ($this->auth == null) {
             return false;
         }
-        if($this->auth->getOAuth()->authenticate() and isset($_SESSION['username'])){
+        if ($this->auth->getOAuth()->authenticate() and isset($_SESSION['username'])) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -89,24 +91,25 @@ class API extends REST
         return $_SESSION['username'];
     }
 
-    public function die($e){
+    public function die($e)
+    {
         $data = [
             "error" => $e->getMessage()
         ];
         $data = $this->json($data);
-        $this->response($data,400);
+        $this->response($data, 400);
     }
 
     public function __call($method, $args)
     {
-       if(is_callable($this->current_call)){
-           return call_user_func_array($this->current_call, $args);
-       }else{
-           $this->response($this->json(['error'=>'method_not_callable']),404);
-       }
+        if (is_callable($this->current_call)) {
+            return call_user_func_array($this->current_call, $args);
+        } else {
+            $this->response($this->json(['error'=>'method_not_callable']), 404);
+        }
     }
 
-    function generate_hash()
+    public function generate_hash()
     {
         $bytes = random_bytes(16);
         return bin2hex($bytes);
@@ -116,13 +119,12 @@ class API extends REST
 
     private function about()
     {
-
         if ($this->get_request_method() != "POST") {
             $error = array('status' => 'WRONG_CALL', "msg" => "The type of call cannot be accepted by our servers.");
             $error = $this->json($error);
             $this->response($error, 406);
         }
-        $data = array('version' => '0.1', 'desc' => 'This API is created by Blovia Technologies Pvt. Ltd., for the public usage for accessing data about vehicles.');
+        $data = array('version' => '0.1', 'desc' => 'This API is created by SBK Pvt. Ltd., for My own  Authentication.');
         $data = $this->json($data);
         $this->response($data, 200);
     }
@@ -138,7 +140,7 @@ class API extends REST
         $st = microtime(true);
         if (isset($this->_request['pass'])) {
             $cost = (int)$this->_request['cost'];
-            // $s = new Signup("" ,$this->_request['pass'], "");  
+            // $s = new Signup("" ,$this->_request['pass'], "");
             // $hash = $s->hashPassword($cost);
             $hash = password_hash($this->_request['pass'], PASSWORD_BCRYPT);
             $data = [
@@ -221,9 +223,9 @@ class API extends REST
 // Initiiate Library
 
 $api = new API;
-try{
+try {
     $api->auth();
     $api->processApi();
-}catch(Exception $e){
+} catch (Exception $e) {
     $api->die($e);
 }

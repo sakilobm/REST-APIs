@@ -1,0 +1,7 @@
+{
+    "require": {
+        "nesbot/carbon": "^2.55",
+        "sendgrid/sendgrid": "^7.11"
+    }
+    
+}
