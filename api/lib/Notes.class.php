@@ -98,10 +98,10 @@ class Notes extends Share
                 $result = mysqli_query($this->db, $query);
                 return $result;
             } else {
-                throw new Exception("Notes Note Loaded 2");
+                throw new Exception("Notes Note Loaded ");
             }
         } else {
-            throw new Exception("unathorized");
+            throw new Exception("unathorized 1 ");
         }
     }
 
@@ -119,5 +119,4 @@ class Notes extends Share
             throw new Exception("Can't Create Note");
         }
     }
-    
 }

@@ -1,6 +1,6 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/lib/Database.class.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/lib/Folders.class.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/api/lib/Folder.class.php');
 require $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 class Signup
 {
@@ -28,41 +28,41 @@ class Signup
         $query = "INSERT INTO tables (username, password, email, active, token) VALUES ('$username', '$password', '$email', '0', '$token');";
         if (!mysqli_query($this->db, $query)) {
             throw new Exception("Unable to signup, user account might already exists");
-        }
-        if ($this->userExists()) {
-            throw new Exception("User already exists");
         } else {
             $this->id = mysqli_insert_id($this->db);
             // $this->sendVerificationMail();
+            $f = new Folder();
+            $f->createNew('Default Folder');
         }
     }
     /*
     * .........................SendGrid...............................
     */
-    public function sendVerificationMail()
-    {
-        $config_json = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../env.json');
-        $config = json_decode($config_json, true);
-        $token = $this->token;
-        $email = new \SendGrid\Mail\Mail();
-        $email->setFrom("noreply@obm", "OBM Creators Support");
-        $email->setSubject("Verify Your Account");
-        $email->addTo($this->email, $this->username);
-        $email->addContent("text/plain", "Please Verify Your Account at:");
-        $email->addContent(
-            "text/html",
-            "<strong>Please Verify Your Account by <a href= </strong>"
-        );
-        $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
-        try {
-            $response = $sendgrid->send($email);
-            // print $response->statusCode() . "\n";
-            // print_r($response->headers());
-            // print $response->body() . "\n";
-        } catch (Exception $e) {
-            echo 'Caught exception: ' . $e->getMessage() . "\n";
-        }
-    }
+    // public function sendVerificationMail()
+    // {
+    //     $config_json = file_get_contents($_SERVER['DOCUMENT_ROOT'].'/../env.json');
+    //     $config = json_decode($config_json, true);
+    //     $token = $this->token;
+    //     $email = new \SendGrid\Mail\Mail();
+    //     $email->setFrom("noreply@obm", "OBM Creators Support");
+    //     $email->setSubject("Verify Your Account");
+    //     $email->addTo($this->email, $this->username);
+    //     $email->addContent("text/plain", "Please Verify Your Account at:");
+    //     $email->addContent(
+    //         "text/html",
+    //         "<strong>Please Verify Your Account by <a href= </strong>"
+    //     );
+    //     $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
+    //     try {
+    //         $response = $sendgrid->send($email);
+    //         // print $response->statusCode() . "\n";
+    //         // print_r($response->headers());
+    //         // print $response->body() . "\n";
+    //     } catch (Exception $e) {
+    //         echo 'Caught exception: ' . $e->getMessage() . "\n";
+    //     }
+    // }
+    
     public function getInsertID()
     {
         return $this->id;

@@ -1,6 +1,6 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/api/lib/Database.class.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . "/api/lib/Database.class.php");
 require_once($_SERVER['DOCUMENT_ROOT'].'/api/lib/Share.class.php');
 require $_SERVER['DOCUMENT_ROOT'].'/vendor/autoload.php';
 use Carbon\Carbon;
@@ -28,7 +28,7 @@ class Folder extends Share
                 $this->data = mysqli_fetch_assoc($result);
                 $this->id = $this->data['id'];
             } else {
-                throw new Exception("Folder not found");
+                throw new Exception("Note not found ".mysqli_error($this->db));
             }
         }
     }
@@ -57,6 +57,14 @@ class Folder extends Share
         $result = mysqli_query($this->db, $query);
         if ($result) {
             $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            for ($i=0; $i<count($data); $i++) {
+                $c_at = $data[$i]['created_at'];
+                $u_at = $data[$i]['updated_at'];
+                $c_c = new Carbon($c_at);
+                $u_c = new Carbon($u_at);
+                $data[$i]['created'] = $c_c->diffForHumans();
+                $data[$i]['updated'] = $u_c->diffForHumans();
+            }
             return $data;
         } else {
             return [];
@@ -71,13 +79,18 @@ class Folder extends Share
             return $data['COUNT(*)'];
         }
     }
-    public static function getAllFolders($per_page=10, $page=1)
+    public static function getAllFolders()
     {
         $db = Database::getConnection();
         $query = "SELECT * FROM folders WHERE owner='$_SESSION[username]';";
         $result = mysqli_query($db, $query);
         if ($result) {
             $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            for ($i=0; $i<count($data); $i++) {
+                $date = $data[$i]['created_at'];
+                $c = new Carbon($date);
+                $data[$i]['created'] = $c->diffForHumans();
+            }
             return $data;
         } else {
             return [];
@@ -87,10 +100,8 @@ class Folder extends Share
     {
         if (isset($_SESSION['username']) and $this->getOwner() == $_SESSION['username']) {
             $notes = $this->getAllNotes();
-            print_r($notes);
             foreach ($notes as $note) {
                 $n = new Notes($note['id']);
-                echo "Deleting note #".$note['id']."....\n";
                 $n->delete();
             }
             if ($this->id) {
@@ -101,7 +112,7 @@ class Folder extends Share
                 throw new Exception("Folders Note Loaded");
             }
         } else {
-            throw new Exception("unathorized");
+            throw new Exception("Unable to delete");
         }
     }
     public function getOwner()

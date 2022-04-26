@@ -9,7 +9,10 @@ session_start();
 $_SESSION['username'] = "Sakil2002";
 
 try {
-    print_r(Folder::getAllFolders());
+    // print_r(Folder::getAllFolders());
+    $f = new Folder(2);
+    echo $f->getName();
+    echo $f->rename("");
 } catch (Exception $e) {
     echo $e->getMessage();
 }
